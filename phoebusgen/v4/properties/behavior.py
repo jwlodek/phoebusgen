@@ -89,7 +89,7 @@ class HasFallback(PropertyBase):
     fallback_color: ColorType = Color((255, 0, 255))
 
 class HasStates(PropertyBase):
-    states: List[State] = ObservableList[State]([State(label='State 1', color=Color((60, 100, 60))), State(value=1, label='State 2', color=Color((60, 255, 60)))])
+    states: List[State] = ObservableList([State(label='State 1', color=Color((60, 100, 60))), State(value=1, label='State 2', color=Color((60, 255, 60)))])
 
 class HasLogScale(PropertyBase):
     log_scale: bool
