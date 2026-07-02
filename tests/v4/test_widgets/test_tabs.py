@@ -20,8 +20,10 @@ def test_create_single_tab():
     label = Label(name='Test Label', text='Hello World', x=10, y=10, width=100, height=30)
     tab.add_widget(label)
     assert len(tab.get_widgets()) == 1
-    assert tab.get_widgets()[0].name == 'Test Label'
-    assert tab.get_widgets()[0].text == 'Hello World'
+    widget_rb = tab.get_widgets()[0]
+    assert isinstance(widget_rb, Label)
+    assert widget_rb.name == 'Test Label'
+    assert widget_rb.text == 'Hello World'
     assert tab == """<?xml version="1.0" ?>
 <tab>
   <name>Test Tab</name>

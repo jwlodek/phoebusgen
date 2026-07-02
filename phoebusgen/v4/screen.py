@@ -275,7 +275,7 @@ class Screen(HasWidgets, HasPosition, HasBackgroundColor, HasMacros, HasName, Ha
         start_path = Path(self.bob_file) if self.bob_file else Path(self.name + '.bob')
         visited = set()  # type: Set[Path]
 
-        def _visit(screen_path: Path, screen: 'Screen', screen_dir: Path = None):
+        def _visit(screen_path: Path, screen: 'Screen', screen_dir: Optional[Path] = None):
             if screen_dir is None:
                 screen_dir = Path(screen_path).resolve().parent
 

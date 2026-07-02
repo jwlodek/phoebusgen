@@ -1,9 +1,9 @@
-from collections.abc import MutableMapping, MutableSequence
-from dataclasses import dataclass, field
+from dataclasses import Field, dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, Generic, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union, SupportsIndex
 
+# Basic primitive union type for property values
 Primitive = Union[int, float, str, bool]
 
 class Color(tuple):
@@ -69,7 +69,7 @@ class Color(tuple):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Color):
             try:
-                other = Color(other)  # type: ignore
+                other = Color(other)
             except ValueError:
                 return False
         return tuple(self) == tuple(other)
@@ -228,55 +228,50 @@ class Format(int, Enum):
     BINARY = 9
 
 
-class ObservableDict(MutableMapping):
+KT = TypeVar('KT')
+VT = TypeVar('VT')
 
-    _on_change_callback = None  # type: Optional[Callable[['ObservableDict'], None]]
+class ObservableDict(Dict[KT, VT]):
 
-    def __init__(self, *args, **kwargs):
-        self._dict = dict(*args, **kwargs)
+    _on_change_callback: Optional[Callable[['ObservableDict[KT, VT]'], None]] = None
 
-    def _notify_change(self):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+
+    def _notify_change(self) -> None:
         if self._on_change_callback:
             self._on_change_callback(self)
 
-    def __setitem__(self, key , value):
-        self._dict[key] = value
+    def __setitem__(self, key: KT, value: VT) -> None:
+        super().__setitem__(key, value)
         self._notify_change()
 
-    def __len__(self):
-        return len(self._dict)
-
-    def __getitem__(self, key):
-        return self._dict[key]
-
-    def __iter__(self):
-        return iter(self._dict)
-
-    def __delitem__(self, key):
-        del self._dict[key]
+    def __delitem__(self, key: KT) -> None:
+        super().__delitem__(key)
         self._notify_change()
 
-    def clear(self):
-        self._dict.clear()
+    def clear(self) -> None:
+        super().clear()
         self._notify_change()
 
-    def pop(self, key, default=None):
-        result = self._dict.pop(key, default)
+    def pop(self, *args: Any) -> Any:
+        result = super().pop(*args)
         self._notify_change()
         return result
 
-    def update(self, other=(), **kwargs):
-        self._dict.update(other, **kwargs)
+    def update(self, other: Any = (), **kwargs: Any) -> None:
+        super().update(other, **kwargs)
         self._notify_change()
 
-    def __repr__(self):
-        return repr(self._dict)
+    def setdefault(self, key: KT, default: Any = None) -> VT:
+        if key not in self:
+            self[key] = default
+        return self[key]
 
-    def __eq__(self, other):
-        if isinstance(other, ObservableDict):
-            return self._dict.__eq__(other._dict)
-        else:
-            return other.__eq__(self._dict)
+    def __ior__(self, other: Any) -> 'ObservableDict[KT, VT]':
+        result = super().__ior__(other)
+        self._notify_change()
+        return result
 
 
 @dataclass
@@ -291,14 +286,16 @@ class ObservableDataclass:
             self._on_change_callback(self)
 
     @classmethod
-    def fields(cls):
-        fields = {}
+    def fields(cls) -> Dict[str, Field]:
+        fields: Dict[str, Field] = {}
         for dcls_field in cls.__dataclass_fields__:
             if not dcls_field.startswith('_'):
                 fields[dcls_field] = cls.__dataclass_fields__[dcls_field]
         return fields
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, ObservableDataclass):
+            return NotImplemented
         for dcls_field in self.fields():
             if getattr(self, dcls_field) != getattr(other, dcls_field):
                 return False
@@ -307,46 +304,84 @@ class ObservableDataclass:
 ValidListType = Union[int, float, str, bool, Enum, ObservableDataclass]
 ValidListTypeT = TypeVar('ValidListTypeT', bound=ValidListType)
 
-class ObservableList(MutableSequence, Generic[ValidListTypeT]):
-    _on_change_callback = None  # type: Optional[Callable[['ObservableList'], None]]
+class ObservableList(List[ValidListTypeT]):
+    _on_change_callback: Optional[Callable[['ObservableList[ValidListTypeT]'], None]] = None
 
-    def __init__(self, *args, **kwargs):
-        self._list = list(*args, **kwargs)
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
 
-    def __getitem__(self, i):
-        return self._list[i]
-
-    def __len__(self):
-        return len(self._list)
-
-    def __delitem__(self, i):
-        self._list.__delitem__(i)
-        self._notify_change()
-
-    def __setitem__(self, i, val):
-        if hasattr(val, '_on_change_callback'):
-            val._on_change_callback = lambda _self: self._notify_change()
-        self._list.__setitem__(i, val)
-        self._notify_change()
-
-    def insert(self, index, value):
-        if hasattr(value, '_on_change_callback'):
-            value._on_change_callback = lambda _self: self._notify_change()
-        self._list.insert(index, value)
-        self._notify_change()
-
-    def __repr__(self):
-        return repr(self._list)
-
-    def __eq__(self, value):
-        return self._list.__eq__(value)
-
-    # Other modifying methods like append, pop, extend are provided by MutableSequence
-    # and will call insert or __delitem__, triggering the callback implicitly.
-
-    def _notify_change(self):
+    def _notify_change(self) -> None:
         if self._on_change_callback:
             self._on_change_callback(self)
+
+    def __setitem__(self, i: Any, val: Any) -> None:
+        if hasattr(val, '_on_change_callback'):
+            val._on_change_callback = lambda _self: self._notify_change()
+        super().__setitem__(i, val)
+        self._notify_change()
+
+    def __delitem__(self, i: Any) -> None:
+        super().__delitem__(i)
+        self._notify_change()
+
+    def insert(self, index: SupportsIndex, value: ValidListTypeT) -> None:
+        if hasattr(value, '_on_change_callback'):
+            value._on_change_callback = lambda _self: self._notify_change()
+        super().insert(index, value)
+        self._notify_change()
+
+    def append(self, value: ValidListTypeT) -> None:
+        if hasattr(value, '_on_change_callback'):
+            value._on_change_callback = lambda _self: self._notify_change()
+        super().append(value)
+        self._notify_change()
+
+    def extend(self, values: Iterable[ValidListTypeT]) -> None:
+        for val in values:
+            if hasattr(val, '_on_change_callback'):
+                val._on_change_callback = lambda _self: self._notify_change()
+        super().extend(values)
+        self._notify_change()
+
+    def pop(self, index: SupportsIndex = -1) -> ValidListTypeT:
+        result = super().pop(index)
+        self._notify_change()
+        return result
+
+    def remove(self, value: ValidListTypeT) -> None:
+        super().remove(value)
+        self._notify_change()
+
+    def clear(self) -> None:
+        super().clear()
+        self._notify_change()
+
+    def sort(self, *args: Any, **kwargs: Any) -> None:
+        super().sort(*args, **kwargs)
+        self._notify_change()
+
+    def reverse(self) -> None:
+        super().reverse()
+        self._notify_change()
+
+    def __iadd__(self, values: Iterable[ValidListTypeT]) -> 'ObservableList[ValidListTypeT]':
+        for val in values:
+            if hasattr(val, '_on_change_callback'):
+                val._on_change_callback = lambda _self: self._notify_change()
+        result = super().__iadd__(values)
+        self._notify_change()
+        return result
+
+
+PropertyType = Union[
+    int, float, str, bool,
+    Tuple,
+    Enum,
+    Color,
+    Dict,
+    List,
+    ObservableDataclass,
+]
 
 
 @dataclass
@@ -427,19 +462,19 @@ class Trace(ObservableDataclass):
 @dataclass
 class NavTab(ObservableDataclass):
     name: str = ''
-    file: Optional[Path] = None
+    file: Optional[Union[Path, str]] = None
     macros: Dict[str, str] = field(default_factory=ObservableDict)
     group_name: str = ''
 
 @dataclass
 class Script(ObservableDataclass):
-    file: Optional[Path] = None
+    file: Optional[Union[Path, str]] = None
     pv_names: List[str] = field(default_factory=ObservableList[str])
 
 @dataclass
 class EmbeddedScript(Script):
-    text: str = ''
     file: EmbeddedScriptType
+    text: str = ''
 
 @dataclass
 class Action(ObservableDataclass):
@@ -447,7 +482,7 @@ class Action(ObservableDataclass):
 
 @dataclass
 class OpenDisplayAction(Action):
-    file: Optional[Path] = None
+    file: Optional[Union[Path, str]] = None
     target: OpenDisplayTarget = OpenDisplayTarget.REPLACE
     macros: Dict[str, str] = field(default_factory=ObservableDict)
 
@@ -466,7 +501,7 @@ class CommandAction(Action):
 
 @dataclass
 class OpenFileAction(Action):
-    file: Optional[Path] = None
+    file: Optional[Union[Path, str]] = None
 
 @dataclass
 class OpenWebpageAction(Action):
@@ -475,20 +510,16 @@ class OpenWebpageAction(Action):
 @dataclass
 class RuleExpression(ObservableDataclass):
     bool_exp: str = ''
-    value: Optional[ValidListTypeT] = None
+    value: Optional[PropertyType] = None
     value_as_expression: bool = False
 
-@dataclass
-class RulePvName(ObservableDataclass):
-    name: str = ''
-    trigger: bool = True
 
 @dataclass
 class Rule(ObservableDataclass):
     name: str = 'New Rule'
     prop_id: str = 'name'
     expressions: List[RuleExpression] = field(default_factory=ObservableList[RuleExpression])
-    pv_names: Dict[str, RulePvName] = field(default_factory=ObservableDict)
+    pv_names: Dict[str, bool] = field(default_factory=ObservableDict)
     out_exp: bool = False
 
 @dataclass

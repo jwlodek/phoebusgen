@@ -3,6 +3,7 @@ from enum import Enum
 from typing import List, Optional, Sequence, Set, Type, TypeVar, Union
 from xml.etree.ElementTree import Element
 
+from phoebusgen.v4.properties import widget
 from phoebusgen.v4.properties.behavior import HasActionsRulesAndScripts, HasToolTip
 from phoebusgen.v4.properties.display import HasVisible
 from phoebusgen.v4.properties.position import HasPosition
@@ -292,18 +293,15 @@ class HasWidgets(PhoebusElement, PropertyBase):
         :param elem: <list/Phoebusgen.widget> List of Phoebusgen.widget's or a single widget to add
         """
 
-        def _insert_widget(self, widget: Widget):
+        if isinstance(elem, Widget):
+            elem = [elem]  # Wrap single widget in a list for uniform processing
+
+        for widget in elem:
             widget.parent = self
             valid_name = self._make_valid_widget_name(self.get_widget_names(), widget.name)
             if valid_name != widget.name:
                 widget.name = valid_name
             self.widgets.append(widget)
-
-        if isinstance(elem, Sequence):
-            for e in elem:
-                _insert_widget(self, e)
-        else:
-            _insert_widget(self, elem)
 
 
     def get_widgets(self) -> List[Widget]:
@@ -399,13 +397,16 @@ class HasWidgets(PhoebusElement, PropertyBase):
 
 # Wrap the metaclass-generated widgets property to set parent on each widget
 # when the list is read (e.g. from XML via from_element).
-_widgets_prop = HasWidgets.widgets
+_widgets_prop: property = HasWidgets.widgets  # type: ignore
 _widgets_fget = _widgets_prop.fget
 _widgets_fset = _widgets_prop.fset
 
 
 def _widgets_getter_with_parent(self: HasWidgets) -> List[Widget]:
     """Get the list of widgets and set their parent to the container."""
+
+    if _widgets_fget is None:
+        raise AttributeError('Cannot get widgets property; no getter defined.')
 
     widgets = _widgets_fget(self)
     for w in widgets:
@@ -425,7 +426,10 @@ def _widgets_setter_with_rename_on_conflict(self: HasWidgets, widgets: List[Widg
         if widget_name != widget.name:
             widget.name = widget_name
         widget_name_set.add(widget_name)
-    _widgets_fset(self, widgets)
+    if _widgets_fset is not None:
+        _widgets_fset(self, widgets)
+    else:
+        raise AttributeError('Cannot set widgets property; no setter defined.')
 
 
-HasWidgets.widgets = property(_widgets_getter_with_parent, _widgets_setter_with_rename_on_conflict)
+HasWidgets.widgets = property(_widgets_getter_with_parent, _widgets_setter_with_rename_on_conflict)  # type: ignore

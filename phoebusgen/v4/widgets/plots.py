@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 from phoebusgen.v4.properties.behavior import (
     HasAlarmBorder,
@@ -45,7 +45,7 @@ class DataBrowser(Widget, HasMacros, HasFile, HasShowToolbar, HasSelectionValueP
     width: int = 400
     height: int = 300
 
-    def __init__(self, name: str, file: Union[Path, str], x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str, file: Optional[Union[Path, str]], x: int, y: int, width: int, height: int) -> None:
         """
         Create DataBrowser Widget
 

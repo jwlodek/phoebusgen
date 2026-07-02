@@ -330,6 +330,7 @@ def test_get_list_property_primitive():
 def test_set_list_property_primitive():
     values = [1, 2, 3]
     elem = PropertyBase._set_list_property('items', 'items', values)
+    assert isinstance(elem, Element)
     assert elem.tag == 'items'
     items = elem.findall('item')
     assert len(items) == 3
@@ -359,6 +360,7 @@ def test_set_list_property_dataclass():
         State(label='State 2', value=1, color=Color((100, 0, 255)))
     ]
     elem = PropertyBase._set_list_property('states', 'states', states)
+    assert isinstance(elem, Element)
     assert elem.tag == 'states'
     state_elems = elem.findall('state')
     assert len(state_elems) == 2
@@ -388,6 +390,7 @@ def test_get_dict_property():
 def test_set_dict_property():
     data = {'key1': 'value1', 'key2': 'value2'}
     elem = PropertyBase._set_dict_property('macros', ObservableDict(data))
+    assert isinstance(elem, Element)
     assert elem.tag == 'macros'
     for key, value in data.items():
         item_elem = _get_elem(elem, key)
@@ -415,7 +418,7 @@ def test_get_rule_expression_property():
     assert isinstance(rule_expr, RuleExpression)
     assert rule_expr.bool_exp == 'pv0 == 0'
     assert not rule_expr.value_as_expression
-    assert rule_expr.value == Color((255, 0, 0, 255))
+    assert rule_expr.value == (255, 0, 0, 255)
 
 
 # TODO: Currently this doesn't raise an error, but it should.
@@ -538,7 +541,7 @@ def test_get_property_type_from_prop_id(prop_id, expected_type):
 def test_set_prop_with_incorrect_type_raises_typerror():
     xy_plot = XYPlot(name='Test Plot', x=10, y=20, width=400, height=300)
     with pytest.raises(TypeError, match="invalid type for property 'x': must be of type <class 'int'>"):
-        xy_plot.x = 'Hello Phoebusgen'
+        xy_plot.x = 'Hello Phoebusgen'  # type: ignore (This test is intentionally passing an incorrect type to test error handling)
 
 
 def test_get_property_classes():
@@ -589,7 +592,7 @@ def test_get_property_names():
     assert xy_plot.get_property_names(property_cls = HasVisible) == ['visible']
 
     with pytest.raises(ValueError, match="Class 'str' is not a property mixin class that 'XYPlot' inherits from!"):
-        xy_plot.get_property_names(property_cls=str)
+        xy_plot.get_property_names(property_cls=str)  # type: ignore (This test is intentionally passing an incorrect type to test error handling)
 
 
 def test_get_property_type_by_name():

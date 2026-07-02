@@ -55,7 +55,7 @@ class Array(Widget, HasPVName, HasMacros, HasForegroundColor, HasBackgroundColor
 class EmbeddedDisplay(Widget, HasMacros, HasFile, HasResizeBehavior, HasGroupName, HasTransparent, HasBorder):
     """EmbeddedDisplay Phoebus Widget"""
 
-    def __init__(self, name: str, file: Union[Path, str], x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str, file: Optional[Union[Path, str]], x: int, y: int, width: int, height: int) -> None:
         """
         Create EmbeddedDisplay Widget
 
@@ -115,9 +115,10 @@ class Tab(HasWidgets, HasName):
         :param name: Tab name
         :param root: Optional XML element to initialize the tab from
         """
-        self.root = root
         if root is None:
             self.root = Element('tab')
+        else:
+            self.root = root
         self.name = name
 
         children_elem = self.root.find('children')
@@ -172,10 +173,10 @@ class Tabs(Widget, HasTabs, HasMacros, HasTabActiveHeightDirection, HasFont, Has
         Widget.__init__(self, name, x, y, width, height)
 
 
-class TemplateInstance(Widget, HasWidgets, HasFile, HasInstances, HasTransparent, HasHorizontal, HasWrapCount, HasGap):
+class TemplateInstance(Widget, HasWidgets, HasMacros, HasFile, HasInstances, HasTransparent, HasHorizontal, HasWrapCount, HasGap):
     """TemplateInstance Phoebus Widget"""
 
-    def __init__(self, name: str, file: Union[Path, str], x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str, file: Optional[Union[Path, str]], x: int, y: int, width: int, height: int) -> None:
         """
         Create TemplateInstance Widget
 

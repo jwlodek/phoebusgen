@@ -20,7 +20,7 @@ from phoebusgen.v4.widgets import Label, Rectangle, TextUpdate, Widget
 from phoebusgen.v4.widgets.structure import Group
 from phoebusgen.v4.widgets.widget import WidgetType, _widget_type_from_class_name
 
-WIDGET_CLASSES = Widget.__subclasses__()
+WIDGET_CLASSES: List[Type[Widget]] = Widget.__subclasses__()
 
 
 @pytest.mark.parametrize('widget_class', WIDGET_CLASSES, ids=lambda cls: cls.__name__)
