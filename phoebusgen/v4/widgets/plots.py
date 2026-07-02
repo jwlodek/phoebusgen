@@ -32,7 +32,6 @@ from phoebusgen.v4.properties.display import (
     HasTitleFont,
 )
 from phoebusgen.v4.properties.misc import HasCursor, HasMarkers, HasROIs
-from phoebusgen.v4.properties.types import Color
 from phoebusgen.v4.properties.widget import HasFile, HasMacros, HasPVName
 
 from .widget import Widget

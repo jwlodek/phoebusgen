@@ -54,7 +54,7 @@ from phoebusgen.v4.properties.misc import (
     HasSelectionPV,
     HasSelectRows,
 )
-from phoebusgen.v4.properties.types import Color, HorizontalAlignment, VerticalAlignment
+from phoebusgen.v4.properties.types import Color, ColorType, HorizontalAlignment, VerticalAlignment
 from phoebusgen.v4.properties.widget import HasBit, HasPVName, HasSymbols
 
 from .widget import Widget
@@ -87,7 +87,7 @@ class LED(Widget, HasPVName, HasBit, HasOnOffColors, HasOnOffLabels, HasFont, Ha
     """LED Phoebus Widget"""
 
     width: int = 20
-    line_color: Color = Color((50, 50, 50, 178))
+    line_color: ColorType = Color((50, 50, 50, 178))
 
     def __init__(self, name: str, pv_name: str, x: int, y: int, width: int, height: int) -> None:
         """
@@ -109,7 +109,7 @@ class LEDMultiState(Widget, HasPVName, HasFont, HasForegroundColor, HasLineColor
 
     width: int = 20
     height: int = 20
-    line_color: Color = Color((50, 50, 50, 178))
+    line_color: ColorType = Color((50, 50, 50, 178))
 
     def __init__(self, name: str, pv_name: str, x: int, y: int, width: int, height: int) -> None:
         """
@@ -154,8 +154,8 @@ class Meter(Widget, HasPVName, HasForegroundColor, HasBackgroundColor, HasFont, 
 
     width: int = 240
     height: int = 120
-    needle_color: Color = Color((255, 5, 7))
-    knob_color: Color = Color((177, 166, 155))
+    needle_color: ColorType = Color((255, 5, 7))
+    knob_color: ColorType = Color((177, 166, 155))
 
     def __init__(self, name: str, pv_name: str, x: int, y: int, width: int, height: int) -> None:
         """
