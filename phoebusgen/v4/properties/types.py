@@ -29,7 +29,7 @@ class Color(tuple):
         # TODO: validate predefined color names
         return False
 
-    def __new__(cls: type['Color'], color: Optional[Union[Tuple[int, int, int], Tuple[int, int, int, int], str]] = None):
+    def __new__(cls, color: Optional[Union[Tuple[int, int, int], Tuple[int, int, int, int], str]] = None):
         if color is None:
             color = (0, 0, 0)
         red = 0
