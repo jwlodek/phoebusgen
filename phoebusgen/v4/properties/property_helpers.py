@@ -140,7 +140,7 @@ def _make_default_prop_val(property_type: Type[PropertyType]) -> PropertyType:
         return property_type()  # Call the type to get a default value (e.g. int() -> 0, str() -> '', etc.)
 
 
-def _str_to_primitive(value: str, property_type: type[PrimitiveT]) -> PrimitiveT:
+def _str_to_primitive(value: str, property_type: Type[PrimitiveT]) -> PrimitiveT:
     """Convert a string value to a primitive type (int, float, str, bool) based on the given property type."""
 
     if property_type is bool:
