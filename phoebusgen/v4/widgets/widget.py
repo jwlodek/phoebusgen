@@ -1,6 +1,6 @@
 import re
 from enum import Enum
-from typing import List, Optional, Sequence, Set, Type, TypeVar, Union
+from typing import cast, List, Optional, Sequence, Set, Type, TypeVar, Union
 from xml.etree.ElementTree import Element
 
 from phoebusgen.v4.properties.behavior import HasActionsRulesAndScripts, HasToolTip
@@ -174,7 +174,7 @@ class Widget(PhoebusElement, HasParent, HasVisible, HasName, HasPosition, HasAct
 
         instance = instance_cls.__new__(instance_cls)
         instance.root = element
-        return instance
+        return cast(WidgetT, instance)
 
     @property
     def version(self) -> str:

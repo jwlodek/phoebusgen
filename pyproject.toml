@@ -25,7 +25,7 @@ dependencies = [
   'dataclasses; python_version < "3.7"',
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
   "ipython>=7.16.3",
   "pre-commit",

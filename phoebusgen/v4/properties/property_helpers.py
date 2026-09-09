@@ -47,6 +47,11 @@ ObservableDataclassT = TypeVar('ObservableDataclassT', bound=ObservableDataclass
 
 NoneType = type(None)  # Used for checking if a type is NoneType (e.g. for Optional[X] which is Union[X, NoneType])
 
+# Concrete runtime classes behind the PropertyType union, for isinstance checks.
+# PropertyType itself can't be used with isinstance because it contains subscripted
+# generics (e.g. Tuple, Dict, List), which raise TypeError on Python 3.8/3.9.
+_PROPERTY_TYPE_CLASSES = (int, float, str, bool, tuple, Enum, Color, dict, list, ObservableDataclass)
+
 @dataclass
 class PropertyInfo:
     type: Type[PropertyType]
@@ -239,7 +244,7 @@ class PropertyMetaclass(type):
         is_property_mixin = name not in ['PropertyBase', 'Widget', 'Screen'] and not any(base.__name__ in ['Widget', 'Screen'] for base in bases)
         if not is_property_mixin:
             for prop_name, default_val in attrs.items():
-                if prop_name.startswith('_') or callable(default_val) or not isinstance(default_val, PropertyType):
+                if prop_name.startswith('_') or callable(default_val) or not isinstance(default_val, _PROPERTY_TYPE_CLASSES):
                     continue
                 # Check if this attribute matches a property defined in a parent mixin
                 for prop_cls, props in all_properties.items():
