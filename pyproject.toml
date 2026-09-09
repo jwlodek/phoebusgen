@@ -25,13 +25,12 @@ dependencies = [
   'dataclasses; python_version < "3.7"',
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
   "ipython>=7.16.3",
   "pre-commit",
   "pytest",
   "pytest-cov",
-  "ty; python_version >= '3.11'",
 ]
 docs = [
   "sphinx",
