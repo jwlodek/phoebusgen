@@ -62,7 +62,7 @@ jobs:
         if: ${{ !matrix.container }}
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
+          pip install -e . --group dev
       - name: Install dependencies (legacy Python in container)
         if: ${{ matrix.container }}
         run: |
@@ -70,7 +70,6 @@ jobs:
           # Instead, add the source directory to PYTHONPATH and install test deps.
           python -m pip install --upgrade pip
           pip install pytest pytest-cov
-          pip install -r requirements.txt || true
       - name: Install dataclasses backport
         if: ${{ matrix.python-version == '3.6' }}
         run: pip install dataclasses
