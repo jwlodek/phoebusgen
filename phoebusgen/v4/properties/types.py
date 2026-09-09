@@ -1,7 +1,17 @@
 from dataclasses import Field, dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union, SupportsIndex
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union, TYPE_CHECKING
+
+# SupportsIndex was added to typing in Python 3.8. Use the real type for the
+# type checker, but fall back to int at runtime on 3.6/3.7.
+if TYPE_CHECKING:
+    from typing import SupportsIndex
+else:
+    try:
+        from typing import SupportsIndex
+    except ImportError:
+        SupportsIndex = int
 
 # Basic primitive union type for property values
 Primitive = Union[int, float, str, bool]
