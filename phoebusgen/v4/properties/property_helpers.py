@@ -694,6 +694,8 @@ class PropertyBase(metaclass=PropertyMetaclass):
             field_type = _normalize_property_type(property_type.fields()[field].type)
 
             if field_elem is None and field in element.attrib:
+                if not (field_type in get_args(Primitive) or issubclass(field_type, Enum)):
+                    raise TypeError(f"Only primitive types and enums are supported as element attributes, got {field_type} for field '{property_type.__name__}.{field}'")
                 field_values[field] = _str_to_primitive(element.attrib[field] or '', field_type)
             elif field_elem is not None and (field_elem.text is not None or field_type not in (int, float, str, bool, Path)):
                 typed_getter = cls._find_getter_by_type(field_type)
@@ -725,12 +727,12 @@ class PropertyBase(metaclass=PropertyMetaclass):
 
             if valid:
                 if field in value._attrib_fields:
-                    if field_type in (int, float, str, bool):
+                    if field_type in get_args(Primitive):
                         element.attrib[field] = str(field_value)
                     elif isinstance(field_value, Enum):
                         element.attrib[field] = field_value.value
                     else:
-                        raise TypeError('Only primitive types or enums can be set as attributes!')
+                        raise TypeError(f'Only primitive types or enums can be set as attributes, got {field_type}')
                 else:
                     typed_setter = cls._find_setter_by_type(field_type)
                     sub_elem = typed_setter(field, field_value)
