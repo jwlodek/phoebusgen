@@ -29,8 +29,7 @@ class Color(tuple):
         # TODO: validate predefined color names
         return False
 
-    def __new__(cls, color=None):
-        # type: (Union[Tuple[int, int, int], Tuple[int, int, int, int], str]) -> Color
+    def __new__(cls: type['Color'], color: Optional[Union[Tuple[int, int, int], Tuple[int, int, int, int], str]] = None):
         if color is None:
             color = (0, 0, 0)
         red = 0
@@ -67,7 +66,10 @@ class Color(tuple):
             color_tuple += (alpha,)
         return super().__new__(cls, tuple(color_tuple))
 
+
     def as_hex(self) -> str:
+        """Returns the color as a hex string in the format #RRGGBB or #RRGGBBAA."""
+
         if len(self) == 3:
             return '#{:02X}{:02X}{:02X}'.format(self[0], self[1], self[2])
         elif len(self) == 4:
@@ -76,7 +78,7 @@ class Color(tuple):
             raise ValueError('Color tuple must be of length 3 (RGB) or 4 (RGBA)')
 
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Color):
             try:
                 other = Color(other)
@@ -246,39 +248,48 @@ class ObservableDict(Dict[KT, VT]):
     _on_change_callback: Optional[Callable[['ObservableDict[KT, VT]'], None]] = None
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initializes the observable dictionary."""
         super().__init__(*args, **kwargs)
 
     def _notify_change(self) -> None:
+        """Notify the callback function that the dictionary has changed."""
         if self._on_change_callback:
             self._on_change_callback(self)
 
     def __setitem__(self, key: KT, value: VT) -> None:
+        """Update the value for the given key and notify the callback."""
         super().__setitem__(key, value)
         self._notify_change()
 
     def __delitem__(self, key: KT) -> None:
+        """Delete the item with the given key and notify the callback."""
         super().__delitem__(key)
         self._notify_change()
 
     def clear(self) -> None:
+        """Remove all items from the dictionary and notify the callback."""
         super().clear()
         self._notify_change()
 
     def pop(self, *args: Any) -> Any:
+        """Remove the specified key and return the corresponding value, notifying the callback."""
         result = super().pop(*args)
         self._notify_change()
         return result
 
     def update(self, other: Any = (), **kwargs: Any) -> None:
+        """Update the dictionary with the key/value pairs from other, overwriting existing keys, and notify the callback."""
         super().update(other, **kwargs)
         self._notify_change()
 
     def setdefault(self, key: KT, default: Any = None) -> VT:
+        """Set the default value for the given key and notify the callback if the key was not present."""
         if key not in self:
             self[key] = default
         return self[key]
 
     def __ior__(self, other: Any) -> 'ObservableDict[KT, VT]':
+        """Update the dictionary with the key/value pairs from other, overwriting existing keys, and notify the callback."""
         result = super().__ior__(other)
         self._notify_change()
         return result
@@ -291,12 +302,14 @@ class ObservableDataclass:
     _attrib_fields: List[str] = field(init=False, default_factory=list, repr=False)
 
     def __setattr__(self, name: str, value: Any) -> None:
+        """Set the attribute and notify the callback if applicable."""
         super().__setattr__(name, value)
         if name != '_on_change_callback' and self._on_change_callback:
             self._on_change_callback(self)
 
     @classmethod
     def fields(cls) -> Dict[str, Field]:
+        """Return a dictionary of the dataclass fields, excluding private fields."""
         fields: Dict[str, Field] = {}
         for dcls_field in cls.__dataclass_fields__:
             if not dcls_field.startswith('_'):
@@ -304,6 +317,7 @@ class ObservableDataclass:
         return fields
 
     def __eq__(self, other: object) -> bool:
+        """Check equality with another ObservableDataclass instance based on the values of its fields."""
         if not isinstance(other, ObservableDataclass):
             return NotImplemented
         for dcls_field in self.fields():
@@ -318,35 +332,43 @@ class ObservableList(List[ValidListTypeT]):
     _on_change_callback: Optional[Callable[['ObservableList[ValidListTypeT]'], None]] = None
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize an observable list."""
         super().__init__(*args, **kwargs)
 
     def _notify_change(self) -> None:
+        """Notify the callback function that the list has changed."""
         if self._on_change_callback:
             self._on_change_callback(self)
 
     def __setitem__(self, i: Any, val: Any) -> None:
+        """Set the item at index i to val and notify the callback."""
+
         if hasattr(val, '_on_change_callback'):
             val._on_change_callback = lambda _self: self._notify_change()
         super().__setitem__(i, val)
         self._notify_change()
 
     def __delitem__(self, i: Any) -> None:
+        """Delete the item at index i and notify the callback."""
         super().__delitem__(i)
         self._notify_change()
 
     def insert(self, index: SupportsIndex, value: ValidListTypeT) -> None:
+        """Insert value before index and notify the callback."""
         if hasattr(value, '_on_change_callback'):
             value._on_change_callback = lambda _self: self._notify_change()
         super().insert(index, value)
         self._notify_change()
 
     def append(self, value: ValidListTypeT) -> None:
+        """Append value to the end of the list and notify the callback."""
         if hasattr(value, '_on_change_callback'):
             value._on_change_callback = lambda _self: self._notify_change()
         super().append(value)
         self._notify_change()
 
     def extend(self, values: Iterable[ValidListTypeT]) -> None:
+        """Extend the list with the given values and notify the callback."""
         for val in values:
             if hasattr(val, '_on_change_callback'):
                 val._on_change_callback = lambda _self: self._notify_change()
@@ -354,27 +376,33 @@ class ObservableList(List[ValidListTypeT]):
         self._notify_change()
 
     def pop(self, index: SupportsIndex = -1) -> ValidListTypeT:
+        """Remove and return the item at the given index, notifying the callback."""
         result = super().pop(index)
         self._notify_change()
         return result
 
     def remove(self, value: ValidListTypeT) -> None:
+        """Remove the first occurrence of value and notify the callback."""
         super().remove(value)
         self._notify_change()
 
     def clear(self) -> None:
+        """Remove all items from the list and notify the callback."""
         super().clear()
         self._notify_change()
 
     def sort(self, *args: Any, **kwargs: Any) -> None:
+        """Sort the list in place and notify the callback."""
         super().sort(*args, **kwargs)
         self._notify_change()
 
     def reverse(self) -> None:
+        """Reverse the list in place and notify the callback."""
         super().reverse()
         self._notify_change()
 
     def __iadd__(self, values: Iterable[ValidListTypeT]) -> 'ObservableList[ValidListTypeT]':
+        """Extend the list in place with the given values and notify the callback."""
         for val in values:
             if hasattr(val, '_on_change_callback'):
                 val._on_change_callback = lambda _self: self._notify_change()
