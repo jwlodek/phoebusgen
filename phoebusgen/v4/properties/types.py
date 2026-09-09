@@ -69,7 +69,6 @@ class Color(tuple):
 
     def as_hex(self) -> str:
         """Returns the color as a hex string in the format #RRGGBB or #RRGGBBAA."""
-
         if len(self) == 3:
             return '#{:02X}{:02X}{:02X}'.format(self[0], self[1], self[2])
         elif len(self) == 4:
@@ -79,6 +78,7 @@ class Color(tuple):
 
 
     def __eq__(self, other: Any) -> bool:
+        """Check equality with another Color instance or a compatible color representation."""
         if not isinstance(other, Color):
             try:
                 other = Color(other)
@@ -342,7 +342,6 @@ class ObservableList(List[ValidListTypeT]):
 
     def __setitem__(self, i: Any, val: Any) -> None:
         """Set the item at index i to val and notify the callback."""
-
         if hasattr(val, '_on_change_callback'):
             val._on_change_callback = lambda _self: self._notify_change()
         super().__setitem__(i, val)
