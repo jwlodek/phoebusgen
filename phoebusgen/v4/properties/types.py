@@ -13,8 +13,18 @@ else:
     except ImportError:
         SupportsIndex = int
 
-# Basic primitive union type for property values
-Primitive = Union[int, float, str, bool]
+PropertyType = Union[
+    int, float, str, bool,
+    Tuple,
+    Enum,
+    'Color',
+    'Font',
+    'ObservableDict',
+    'ObservableList',
+    'ObservableDataclass',
+    'Rule',
+    'RuleExpression',
+]
 
 class Color(tuple):
 
@@ -410,15 +420,7 @@ class ObservableList(List[ValidListTypeT]):
         return result
 
 
-PropertyType = Union[
-    int, float, str, bool,
-    Tuple,
-    Enum,
-    Color,
-    Dict,
-    List,
-    ObservableDataclass,
-]
+
 
 
 @dataclass

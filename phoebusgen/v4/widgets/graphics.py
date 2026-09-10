@@ -81,6 +81,7 @@ class Label(Widget, HasText, HasMacros, HasFont, HasForegroundColor, HasBackgrou
     height: int = 20
     text: str = 'Label text'
     vertical_alignment: VerticalAlignment = VerticalAlignment.TOP
+    transparent: bool = True  # Labels are transparent by default.
 
     def __init__(self, name: str, text: str, x: int, y: int, width: int, height: int) -> None:
         """

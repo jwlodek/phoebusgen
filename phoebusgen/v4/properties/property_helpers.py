@@ -36,12 +36,12 @@ from .types import (
     ObservableList,
     Rule,
     RuleExpression,
-    Primitive,
     PropertyType,
     ValidListTypeT,
 )
 
-
+Primitive = Union[int, float, str, bool]
+PrimitiveT = TypeVar('PrimitiveT', bound=Primitive)
 PropertyTypeT = TypeVar('PropertyTypeT', bound=PropertyType)
 ObservableDataclassT = TypeVar('ObservableDataclassT', bound=ObservableDataclass)
 
@@ -134,6 +134,22 @@ def _make_default_prop_val(property_type: Type[PropertyType]) -> PropertyType:
     else:
         return property_type()  # Call the type to get a default value (e.g. int() -> 0, str() -> '', etc.)
 
+
+def _str_to_primitive(value: str, property_type: Type[PrimitiveT]) -> PrimitiveT:
+    """Convert a string value to a primitive type (int, float, str, bool) based on the given property type."""
+
+    if property_type is bool:
+        if value not in ('true', 'false'):
+            raise ValueError(f"XML element for bool property has invalid text value '{value}'!")
+        return cast(PrimitiveT, value.lower() == 'true')
+    try:
+        if property_type is int:
+            if float(value).is_integer():
+                return cast(PrimitiveT, int(float(value)))
+            raise ValueError(f"XML element for int property has non-integer text value '{value}'!")
+        return property_type(value)
+    except ValueError as e:
+        raise ValueError(f"could not convert '{value}' to {property_type.__name__}") from e
 
 class PropertyMetaclass(type):
     def __new__(mcs, name: str, bases: Tuple[Type['PropertyBase'], ...], attrs: Dict[str, object]) -> Type:
@@ -251,7 +267,7 @@ class PropertyMetaclass(type):
                     if prop_name in props:
                         # Make a per-class copy of the mixin's property dict so we don't mutate the shared one
                         all_properties[prop_cls] = copy.deepcopy(all_properties[prop_cls])
-                        all_properties[prop_cls][prop_name].default_value = default_val
+                        all_properties[prop_cls][prop_name].default_value = cast(PropertyType, default_val)
                         # Remove the class attribute so the property descriptor from the mixin is used
                         if prop_name in cls.__dict__:
                             delattr(cls, prop_name)
@@ -497,16 +513,7 @@ class PropertyBase(metaclass=PropertyMetaclass):
         :return: The parsed primitive value
         """
 
-        if element.text is None:
-            if property_type is not str:
-                raise ValueError(f"XML element for primitive property '{element.tag}' has no text value!")
-            else:
-                return ''
-
-        if property_type is bool:
-            return element.text.lower() == 'true'
-        else:
-            return property_type(element.text)
+        return _str_to_primitive(element.text or '', property_type)
 
 
     @classmethod
@@ -684,8 +691,10 @@ class PropertyBase(metaclass=PropertyMetaclass):
             field_elem = element.find(field_name)
             field_type = _normalize_property_type(field.type)  # type: ignore
 
-            if field_elem is None and field_name in element.attrib and field_type:
-                field_values[field_name] = field_type(element.attrib[field_name])  # type: ignore
+            if field_elem is None and field_name in element.attrib:
+                if not (field_type in get_args(Primitive) or issubclass(field_type, Enum)):
+                    raise TypeError(f"Only primitive types and enums are supported as element attributes, got {field_type} for field '{property_type.__name__}.{field_name}'")
+                field_values[field_name] = _str_to_primitive(element.attrib[field_name] or '', cast(Type[Primitive], field_type))
             elif field_elem is not None and (field_elem.text is not None or field_type not in (int, float, str, bool, Path)):
                 typed_getter = cls._find_getter_by_type(field_type)
                 getter_args = [field_elem]
@@ -716,12 +725,12 @@ class PropertyBase(metaclass=PropertyMetaclass):
 
             if valid:
                 if field_name in value._attrib_fields:
-                    if field_type in (int, float, str, bool):
+                    if field_type in get_args(Primitive):
                         element.attrib[field_name] = str(field_value)
                     elif isinstance(field_value, Enum):
                         element.attrib[field_name] = str(field_value.value)
                     else:
-                        raise TypeError('Only primitive types or enums can be set as attributes!')
+                        raise TypeError(f'Only primitive types or enums can be set as attributes, got {field_type}')
                 else:
                     typed_setter = cls._find_setter_by_type(field_type)
                     sub_elem = typed_setter(field_name, field_value)
