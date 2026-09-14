@@ -240,8 +240,12 @@ class Screen(HasWidgets, HasPosition, HasBackgroundColor, HasMacros, HasName, Ha
                 else:
                     name = match
                     has_default = False
+                # List property references may index into the list, e.g.
+                # $(traces[0].y_pv); the token before the '[' is the widget
+                # property name Phoebus resolves against.
+                root_name = name.split('[', 1)[0]
                 # Exclude widget property references and built-in macros
-                if name in widget_property_names or name in self.BUILTIN_MACROS:
+                if name in widget_property_names or root_name in widget_property_names or name in self.BUILTIN_MACROS:
                     continue
                 if has_default:
                     macros_with_defaults.add(name)
