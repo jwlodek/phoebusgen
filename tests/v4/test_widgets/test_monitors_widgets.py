@@ -100,7 +100,7 @@ def test_text_update_from_xml():
     assert tu.pv_name == 'MY:PV'
     assert tu.precision == 2
     assert tu.show_units
-    assert tu.format == Format.DECIMAL  # Default format
+    assert tu.format == Format.DEFAULT  # Default format
 
 
 def test_create_led_widget():

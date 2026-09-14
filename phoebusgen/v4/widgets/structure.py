@@ -21,6 +21,7 @@ from phoebusgen.v4.properties.display import (
 )
 from phoebusgen.v4.properties.misc import HasBorder
 from phoebusgen.v4.properties.property_helpers import PropertyBase
+from phoebusgen.v4.properties.types import Color
 from phoebusgen.v4.properties.widget import (
     HasFile,
     HasInstances,
@@ -36,9 +37,9 @@ from .widget import HasWidgets, Widget
 class Array(Widget, HasPVName, HasMacros, HasForegroundColor, HasBackgroundColor, HasAlarmBorder):
     """Array Phoebus Widget"""
 
-    height: int = 300
+    tooltip: str = '$(pv_name)\n$(pv_value)'
 
-    def __init__(self, name: str, pv_name: str, x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', pv_name: str = '', x: int = 0, y: int = 0, width: int = 100, height: int = 300) -> None:
         """
         Create Array Widget
 
@@ -55,7 +56,7 @@ class Array(Widget, HasPVName, HasMacros, HasForegroundColor, HasBackgroundColor
 class EmbeddedDisplay(Widget, HasMacros, HasFile, HasResizeBehavior, HasGroupName, HasTransparent, HasBorder):
     """EmbeddedDisplay Phoebus Widget"""
 
-    def __init__(self, name: str, file: Optional[Union[Path, str]], x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', file: Optional[Union[Path, str]] = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
         Create EmbeddedDisplay Widget
 
@@ -72,7 +73,7 @@ class EmbeddedDisplay(Widget, HasMacros, HasFile, HasResizeBehavior, HasGroupNam
 class Group(Widget, HasWidgets, HasMacros, HasGroupStyle, HasFont, HasForegroundColor, HasBackgroundColor, HasTransparent, HasLineColor):
     """Group Phoebus Widget"""
 
-    def __init__(self, name: str, x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 300, height: int = 200) -> None:
         """
         Create Group Widget
 
@@ -93,7 +94,10 @@ Group._override_property_tag_name('widgets', None)
 class NavigationTabs(Widget, HasNavTabs, HasSelectedColor, HasDeselectedColor, HasFont):
     """NavigationTabs Phoebus Widget"""
 
-    def __init__(self, name: str, x: int, y: int, width: int, height: int) -> None:
+    selected_color: Color = Color((236, 236, 236))
+    deselected_color: Color = Color((200, 200, 200))
+
+    def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 500, height: int = 300) -> None:
         """
         Create NavigationTabs Widget
 
@@ -160,7 +164,7 @@ class HasTabs(PropertyBase):
 class Tabs(Widget, HasTabs, HasMacros, HasTabActiveHeightDirection, HasFont, HasBackgroundColor):
     """Tabs Phoebus Widget"""
 
-    def __init__(self, name: str, x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
         Create Tabs Widget
 
@@ -176,7 +180,9 @@ class Tabs(Widget, HasTabs, HasMacros, HasTabActiveHeightDirection, HasFont, Has
 class TemplateInstance(Widget, HasWidgets, HasMacros, HasFile, HasInstances, HasTransparent, HasHorizontal, HasWrapCount, HasGap):
     """TemplateInstance Phoebus Widget"""
 
-    def __init__(self, name: str, file: Optional[Union[Path, str]], x: int, y: int, width: int, height: int) -> None:
+    horizontal: bool = False
+
+    def __init__(self, name: str = '', file: Optional[Union[Path, str]] = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
         Create TemplateInstance Widget
 

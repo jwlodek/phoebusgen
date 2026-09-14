@@ -24,7 +24,7 @@ from phoebusgen.v4.properties.display import (
     HasVerticalAlignment,
 )
 from phoebusgen.v4.properties.misc import HasBorder
-from phoebusgen.v4.properties.types import Color, ColorType, VerticalAlignment
+from phoebusgen.v4.properties.types import Color, ColorType, HorizontalAlignment, VerticalAlignment
 from phoebusgen.v4.properties.widget import HasFile, HasMacros
 
 from .widget import Widget
@@ -37,11 +37,10 @@ LIGHT_BLUE = Color((30, 144, 255)) # Light blue used for shape bg color
 class Arc(Widget, HasMacros, HasAngle, HasLineWidth, HasLineColor, HasLineStyle, HasBackgroundColor, HasTransparent):
     """Arc Phoebus Widget"""
 
-    height: int = 100
     line_color: ColorType = BLUE
     background_color: ColorType = LIGHT_BLUE
 
-    def __init__(self, name: str, x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 100, height: int = 100) -> None:
         """
         Create Arc Widget
 
@@ -56,11 +55,10 @@ class Arc(Widget, HasMacros, HasAngle, HasLineWidth, HasLineColor, HasLineStyle,
 class Ellipse(Widget, HasMacros, HasLineWidth, HasLineColor, HasLineStyle, HasBackgroundColor, HasTransparent):
     """Ellipse Phoebus Widget"""
 
-    height: int = 50
     line_color: ColorType = BLUE
     background_color: ColorType = LIGHT_BLUE
 
-    def __init__(self, name: str, x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 100, height: int = 50) -> None:
         """
         Create Ellipse Widget
 
@@ -77,13 +75,12 @@ class Label(Widget, HasText, HasMacros, HasFont, HasForegroundColor, HasBackgrou
     """Label Phoebus Widget"""
 
     background_color: ColorType = Color((255, 255, 255))
-    width: int = 100
-    height: int = 20
     text: str = 'Label text'
+    horizontal_alignment: HorizontalAlignment = HorizontalAlignment.LEFT
     vertical_alignment: VerticalAlignment = VerticalAlignment.TOP
     transparent: bool = True  # Labels are transparent by default.
 
-    def __init__(self, name: str, text: str, x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', text: str = 'Label text', x: int = 0, y: int = 0, width: int = 100, height: int = 20) -> None:
         """
         Create Label Widget
 
@@ -100,7 +97,7 @@ class Label(Widget, HasText, HasMacros, HasFont, HasForegroundColor, HasBackgrou
 class Picture(Widget, HasMacros, HasFile, HasStretchToFit, HasRotation, HasOpacity):
     """Picture Phoebus Widget"""
 
-    def __init__(self, name: str, file: Union[Path, str], x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', file: Union[Path, str] = '', x: int = 0, y: int = 0, width: int = 150, height: int = 100) -> None:
         """
         Create Picture Widget
 
@@ -120,7 +117,7 @@ class Polygon(Widget, HasMacros, HasLineWidth, HasLineColor, HasLineStyle, HasTr
     line_color: ColorType = BLUE
     background_color: ColorType = POLY_BLUE
 
-    def __init__(self, name: str, x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 100, height: int = 20) -> None:
         """
         Create Polygon Widget
 
@@ -137,7 +134,7 @@ class Polyline(Widget, HasMacros, HasLineWidth, HasLineColor, HasLineStyle, HasA
 
     line_color: ColorType = BLUE
 
-    def __init__(self, name: str, x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 100, height: int = 20) -> None:
         """
         Create Polyline Widget
 
@@ -155,7 +152,7 @@ class Rectangle(Widget, HasMacros, HasLineWidth, HasLineColor, HasLineStyle, Has
     line_color: ColorType = BLUE
     background_color: ColorType = LIGHT_BLUE
 
-    def __init__(self, name: str, x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 100, height: int = 20) -> None:
         """
         Create Rectangle Widget
 

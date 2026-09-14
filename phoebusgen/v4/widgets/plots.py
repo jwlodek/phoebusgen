@@ -32,6 +32,7 @@ from phoebusgen.v4.properties.display import (
     HasTitleFont,
 )
 from phoebusgen.v4.properties.misc import HasCursor, HasMarkers, HasROIs
+from phoebusgen.v4.properties.types import Axis, Font, FontStyle
 from phoebusgen.v4.properties.widget import HasFile, HasMacros, HasPVName
 
 from .widget import Widget
@@ -41,10 +42,8 @@ class DataBrowser(Widget, HasMacros, HasFile, HasShowToolbar, HasSelectionValueP
     """DataBrowser Phoebus Widget"""
 
     show_toolbar: bool = False
-    width: int = 400
-    height: int = 300
 
-    def __init__(self, name: str, file: Optional[Union[Path, str]], x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', file: Optional[Union[Path, str]] = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
         Create DataBrowser Widget
 
@@ -63,10 +62,13 @@ class Image(Widget, HasPVName, HasBackgroundColor, HasForegroundColor, HasShowTo
             HasMinMax, HasCursor, HasROIs):
     """Image Phoebus Widget"""
 
-    width: int = 400
-    height: int = 300
+    limits_from_pv: bool = False
+    maximum: float = 255.0
+    tooltip: str = '$(pv_name)'
+    x_axis: Axis = Axis(title='X', maximum=100.0, title_font=Font(style=FontStyle.BOLD))
+    y_axis: Axis = Axis(title='Y', maximum=100.0, title_font=Font(style=FontStyle.BOLD))
 
-    def __init__(self, name: str, pv_name: str, x: int, y: int, width: int, height: int) -> None:
+    def __init__(self, name: str = '', pv_name: str = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
         Create Image Widget
 
@@ -85,7 +87,12 @@ class StripChart(Widget, HasForegroundColor, HasBackgroundColor, HasShowGrid, Ha
                  HasYAxes, HasTraces):
     """StripChart Phoebus Widget"""
 
-    def __init__(self, name: str, x: int, y: int, width: int, height: int) -> None:
+    show_toolbar: bool = True
+    tooltip: str = '$(traces[0].y_pv)'
+    title_font: Font = Font(size=18, style=FontStyle.BOLD)
+    label_font: Font = Font(style=FontStyle.BOLD)
+
+    def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
         Create StripChart Widget
 
@@ -101,7 +108,12 @@ class XYPlot(Widget, HasForegroundColor, HasBackgroundColor, HasTitle,
              HasTitleFont, HasShowToolbar, HasShowLegend, HasXAxis, HasYAxes, HasTraces, HasMarkers):
     """XYPlot Phoebus Widget"""
 
-    def __init__(self, name: str, x: int, y: int, width: int, height: int) -> None:
+    show_legend: bool = True
+    tooltip: str = '$(traces[0].y_pv)'
+    title_font: Font = Font(size=18, style=FontStyle.BOLD)
+    x_axis: Axis = Axis(title='X', maximum=100.0, autoscale=False, show_grid=False, title_font=Font(style=FontStyle.BOLD))
+
+    def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
         Create XYPlot Widget
 

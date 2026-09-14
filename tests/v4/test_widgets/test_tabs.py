@@ -53,7 +53,7 @@ def test_create_tabs_widget():
     # Default direction, tab height, and active tab should be set
     assert tabs.direction == TabDirection.HORIZONTAL
     assert tabs.tab_height == 30
-    assert tabs.active_tab == 1
+    assert tabs.active_tab == 0
 
     assert isinstance(tabs.tabs, ObservableList)
     assert len(tabs.tabs) == 0

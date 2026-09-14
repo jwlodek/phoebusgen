@@ -50,7 +50,7 @@ NoneType = type(None)  # Used for checking if a type is NoneType (e.g. for Optio
 # Concrete runtime classes behind the PropertyType union, for isinstance checks.
 # PropertyType itself can't be used with isinstance because it contains subscripted
 # generics (e.g. Tuple, Dict, List), which raise TypeError on Python 3.8/3.9.
-_PROPERTY_TYPE_CLASSES = (int, float, str, bool, tuple, Enum, Color, dict, list, ObservableDataclass)
+_PROPERTY_TYPE_CLASSES = (int, float, str, bool, tuple, Enum, Color, dict, list, Path, ObservableDataclass)
 
 @dataclass
 class PropertyInfo:
