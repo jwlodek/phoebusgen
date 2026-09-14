@@ -31,13 +31,14 @@ from phoebusgen.v4.properties.widget import (
     HasPVName
 )
 
-from .widget import HasWidgets, Widget
+from .widget import HasWidgets, Widget, STANDARD_TOOLTIP
 
 
 class Array(Widget, HasPVName, HasMacros, HasForegroundColor, HasBackgroundColor, HasAlarmBorder):
     """Array Phoebus Widget"""
 
-    tooltip: str = '$(pv_name)\n$(pv_value)'
+    tooltip: str = STANDARD_TOOLTIP
+    height: int = 300
 
     def __init__(self, name: str = '', pv_name: str = '', x: int = 0, y: int = 0, width: int = 100, height: int = 300) -> None:
         """
@@ -56,6 +57,9 @@ class Array(Widget, HasPVName, HasMacros, HasForegroundColor, HasBackgroundColor
 class EmbeddedDisplay(Widget, HasMacros, HasFile, HasResizeBehavior, HasGroupName, HasTransparent, HasBorder):
     """EmbeddedDisplay Phoebus Widget"""
 
+    width: int = 400
+    height: int = 300
+
     def __init__(self, name: str = '', file: Optional[Union[Path, str]] = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
         Create EmbeddedDisplay Widget
@@ -72,6 +76,9 @@ class EmbeddedDisplay(Widget, HasMacros, HasFile, HasResizeBehavior, HasGroupNam
 
 class Group(Widget, HasWidgets, HasMacros, HasGroupStyle, HasFont, HasForegroundColor, HasBackgroundColor, HasTransparent, HasLineColor):
     """Group Phoebus Widget"""
+
+    width: int = 300
+    height: int = 200
 
     def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 300, height: int = 200) -> None:
         """
@@ -96,6 +103,8 @@ class NavigationTabs(Widget, HasNavTabs, HasSelectedColor, HasDeselectedColor, H
 
     selected_color: Color = Color((236, 236, 236))
     deselected_color: Color = Color((200, 200, 200))
+    width: int = 500
+    height: int = 300
 
     def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 500, height: int = 300) -> None:
         """
@@ -164,6 +173,9 @@ class HasTabs(PropertyBase):
 class Tabs(Widget, HasTabs, HasMacros, HasTabActiveHeightDirection, HasFont, HasBackgroundColor):
     """Tabs Phoebus Widget"""
 
+    width: int = 400
+    height: int = 300
+
     def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
         Create Tabs Widget
@@ -181,6 +193,8 @@ class TemplateInstance(Widget, HasWidgets, HasMacros, HasFile, HasInstances, Has
     """TemplateInstance Phoebus Widget"""
 
     horizontal: bool = False
+    width: int = 400
+    height: int = 300
 
     def __init__(self, name: str = '', file: Optional[Union[Path, str]] = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """

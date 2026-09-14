@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 from phoebusgen.v4.properties.behavior import HasWrapWords
 from phoebusgen.v4.properties.display import (
@@ -39,6 +39,7 @@ class Arc(Widget, HasMacros, HasAngle, HasLineWidth, HasLineColor, HasLineStyle,
 
     line_color: ColorType = BLUE
     background_color: ColorType = LIGHT_BLUE
+    height: int = 100
 
     def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 100, height: int = 100) -> None:
         """
@@ -57,6 +58,7 @@ class Ellipse(Widget, HasMacros, HasLineWidth, HasLineColor, HasLineStyle, HasBa
 
     line_color: ColorType = BLUE
     background_color: ColorType = LIGHT_BLUE
+    height: int = 50
 
     def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 100, height: int = 50) -> None:
         """
@@ -97,7 +99,10 @@ class Label(Widget, HasText, HasMacros, HasFont, HasForegroundColor, HasBackgrou
 class Picture(Widget, HasMacros, HasFile, HasStretchToFit, HasRotation, HasOpacity):
     """Picture Phoebus Widget"""
 
-    def __init__(self, name: str = '', file: Union[Path, str] = '', x: int = 0, y: int = 0, width: int = 150, height: int = 100) -> None:
+    width: int = 150
+    height: int = 100
+
+    def __init__(self, name: str = '', file: Optional[Union[Path, str]] = '', x: int = 0, y: int = 0, width: int = 150, height: int = 100) -> None:
         """
         Create Picture Widget
 

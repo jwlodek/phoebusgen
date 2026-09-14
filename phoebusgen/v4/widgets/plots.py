@@ -42,6 +42,8 @@ class DataBrowser(Widget, HasMacros, HasFile, HasShowToolbar, HasSelectionValueP
     """DataBrowser Phoebus Widget"""
 
     show_toolbar: bool = False
+    width: int = 400
+    height: int = 300
 
     def __init__(self, name: str = '', file: Optional[Union[Path, str]] = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
@@ -67,6 +69,8 @@ class Image(Widget, HasPVName, HasBackgroundColor, HasForegroundColor, HasShowTo
     tooltip: str = '$(pv_name)'
     x_axis: Axis = Axis(title='X', maximum=100.0, title_font=Font(style=FontStyle.BOLD))
     y_axis: Axis = Axis(title='Y', maximum=100.0, title_font=Font(style=FontStyle.BOLD))
+    width: int = 400
+    height: int = 300
 
     def __init__(self, name: str = '', pv_name: str = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
@@ -91,6 +95,8 @@ class StripChart(Widget, HasForegroundColor, HasBackgroundColor, HasShowGrid, Ha
     tooltip: str = '$(traces[0].y_pv)'
     title_font: Font = Font(size=18, style=FontStyle.BOLD)
     label_font: Font = Font(style=FontStyle.BOLD)
+    width: int = 400
+    height: int = 300
 
     def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """
@@ -112,6 +118,8 @@ class XYPlot(Widget, HasForegroundColor, HasBackgroundColor, HasTitle,
     tooltip: str = '$(traces[0].y_pv)'
     title_font: Font = Font(size=18, style=FontStyle.BOLD)
     x_axis: Axis = Axis(title='X', maximum=100.0, autoscale=False, show_grid=False, title_font=Font(style=FontStyle.BOLD))
+    width: int = 400
+    height: int = 300
 
     def __init__(self, name: str = '', x: int = 0, y: int = 0, width: int = 400, height: int = 300) -> None:
         """

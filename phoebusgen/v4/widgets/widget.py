@@ -2,6 +2,7 @@ import re
 from enum import Enum
 from typing import cast, List, Optional, Sequence, Set, Type, TypeVar, Union
 from xml.etree.ElementTree import Element
+import inspect
 
 from phoebusgen.v4.properties.behavior import HasActionsRulesAndScripts, HasToolTip
 from phoebusgen.v4.properties.display import HasVisible
@@ -13,6 +14,7 @@ from phoebusgen.v4.utils import PhoebusElement, prettify_xml
 # Populated at runtime on import of phoebusgen.v4
 widget_versions = {}
 
+STANDARD_TOOLTIP = '$(pv_name)\n$(pv_value)'
 
 class WidgetType(str, Enum):
     """Enum of Phoebus Widget types."""
@@ -99,9 +101,9 @@ class HasParent:
 class Widget(PhoebusElement, HasParent, HasVisible, HasName, HasPosition, HasActionsRulesAndScripts, HasToolTip):
     """Base Class for all Phoebus widgets."""
 
-    def __init__(self, name: str = '', x_pos: int = 0, y_pos: int = 0, width: int = 100, height: int = 100) -> None:
-        """
-        Base Class for all Phoebus widgets
+    def __init__(self, name: str = '', x_pos: int = 0, y_pos: int = 0,
+                 width: int = 100, height: int = 20) -> None:
+        """Base Class for all Phoebus widgets
 
         :param w_type: Widget type to be written into XML
         :param name: Widget name
@@ -172,8 +174,16 @@ class Widget(PhoebusElement, HasParent, HasVisible, HasName, HasPosition, HasAct
         if w_type != expected_type.value:
             raise ValueError(f"Expected widget type '{expected_type.value}', got '{w_type}'")
 
+        # Wrap the existing element directly, then fill in defaults only for the
+        # __init__ kwargs whose property is not already present in the XML.
         instance = instance_cls.__new__(instance_cls)
         instance.root = element
+        for param_name in inspect.signature(instance_cls.__init__).parameters:
+            if param_name == 'self':
+                continue
+            if instance.root.find(param_name) is None:
+                setattr(instance, param_name, getattr(instance, param_name))
+
         return cast(WidgetT, instance)
 
     @property
@@ -401,12 +411,15 @@ _widgets_fset = _widgets_prop.fset
 
 
 def _widgets_getter_with_parent(self: HasWidgets) -> List[Widget]:
-    """Get the list of widgets and set their parent to the container."""
+    """Get the list of widgets and set their parent to the container.
+    
+    :return: List of Widget instances with their parent set to the container
+    """
 
     if _widgets_fget is None:
         raise AttributeError('Cannot get widgets property; no getter defined.')
 
-    widgets = _widgets_fget(self)
+    widgets: List[Widget] = _widgets_fget(self)
     for w in widgets:
         w.parent = self
     return widgets
