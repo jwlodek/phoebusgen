@@ -81,6 +81,7 @@ class Label(Widget, HasText, HasMacros, HasFont, HasForegroundColor, HasBackgrou
     horizontal_alignment: HorizontalAlignment = HorizontalAlignment.LEFT
     vertical_alignment: VerticalAlignment = VerticalAlignment.TOP
     transparent: bool = True  # Labels are transparent by default.
+    tooltip: str = ''
 
     def __init__(self, name: str = '', text: str = 'Label text', x: int = 0, y: int = 0, width: int = 100, height: int = 20) -> None:
         """
