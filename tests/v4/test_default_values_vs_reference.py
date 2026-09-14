@@ -9,7 +9,7 @@ property of every widget is then compared, including non-scalar values such as
 ``Font`` and ``Axis`` dataclasses.
 """
 
-from typing import Type
+from typing import Dict, Type
 import urllib.request
 import urllib.error
 import xml.etree.ElementTree as ET
@@ -71,7 +71,7 @@ def _fetch_reference_root() -> ET.Element:
         pytest.skip(f'Could not parse reference screen: {exc}')
 
 
-def _widget_type_to_class() -> dict[str, Type[Widget]]:
+def _widget_type_to_class() -> Dict[str, Type[Widget]]:
     """Map each Phoebus widget type value (e.g. ``'text_update'``) to its class."""
     mapping = {}
     for subcls in Widget.__subclasses__():
@@ -104,7 +104,7 @@ def test_default_widget_values_match_reference(tmp_path: Path) -> None:
     # Build a second screen with one default-constructed instance of every
     # widget type that appears in the reference.
     our_screen = Screen('phoebusgen defaults')
-    our_widget_by_type: dict[str, Widget] = {}
+    our_widget_by_type: Dict[str, Widget] = {}
     for widget in reference_widgets:
         widget_type = widget.root.attrib['type']
         if widget_type in our_widget_by_type:
