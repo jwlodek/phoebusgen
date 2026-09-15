@@ -517,16 +517,16 @@ class PropertyBase(metaclass=PropertyMetaclass):
 
 
     @classmethod
-    def _set_primitive_property(cls, prop_name: str, value: Primitive) -> Element:
+    def _set_primitive_property(cls, tag_name: str, value: Primitive) -> Element:
         """Given a primitive value (int, float, str, bool), create an XML element with the value as text.
 
-        :param prop_name: The name of the property
+        :param tag_name: The XML tag name to use for the element
         :param value: The primitive value to set
         :return: The XML element representing the primitive property
         """
         if isinstance(value, bool):
-            return _create_element(prop_name, str(value).lower())
-        return _create_element(prop_name, str(value))
+            return _create_element(tag_name, str(value).lower())
+        return _create_element(tag_name, str(value))
 
 
     @classmethod

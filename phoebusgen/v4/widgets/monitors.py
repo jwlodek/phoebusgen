@@ -83,6 +83,11 @@ class ByteMonitor(Widget, HasPVName,HasStartBit, HasNumBits, HasReverseBits, Has
         Widget.__init__(self, name, x, y, width, height)
         self.pv_name = pv_name
 
+# Phoebus uses camelCase tag names for these ByteMonitor bit properties.
+ByteMonitor._override_property_tag_name('start_bit', 'startBit')
+ByteMonitor._override_property_tag_name('num_bits', 'numBits')
+ByteMonitor._override_property_tag_name('reverse_bits', 'bitReverse')
+
 class LED(Widget, HasPVName, HasBit, HasOnOffColors, HasOnOffLabels, HasFont, HasForegroundColor, HasLineColor,
           HasSquare, HasLabelsFromPV, HasAlarmBorder):
     """LED Phoebus Widget"""
